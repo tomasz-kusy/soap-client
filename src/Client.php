@@ -101,6 +101,11 @@ class Client
         $headers = $this->buildHeaders($soapOperation);
         $this->requestMessage = $request = $this->messageFactory->createRequest('POST', $this->serviceDefinition['endpoint'], $headers, $xmlMessage);
 
+        $this->eventDispatcher->dispatch(
+            new ClientEvent($this->requestMessage, 'soap_client.request_message'), 'soap_client.request_message'
+        );
+
+
         try {
             $this->responseMessage = $response = $this->client->sendRequest($request);
             if (strpos($response->getHeaderLine('Content-Type'), 'xml') === false) {
@@ -110,7 +115,9 @@ class Client
                     "Unexpected content type '" . $response->getHeaderLine('Content-Type') . "'"
                 );
             }
-
+            $this->eventDispatcher->dispatch(
+                new ClientEvent($this->responseMessage, 'soap_client.response_message'), 'soap_client.response_message'
+            );
             // fast return if no return is expected
             if (!count($soapOperation['output']['parts'])) {
                 return null;
