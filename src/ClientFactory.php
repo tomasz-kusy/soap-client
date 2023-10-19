@@ -6,6 +6,7 @@ namespace GoetasWebservices\SoapServices\SoapClient;
 
 use GoetasWebservices\SoapServices\Metadata\Loader\MetadataLoaderInterface;
 use GoetasWebservices\SoapServices\Metadata\MetadataUtils;
+use GoetasWebservices\SoapServices\SoapClient\Result\ResultCreatorInterface;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
 use JMS\Serializer\SerializerInterface;
@@ -46,6 +47,11 @@ class ClientFactory
      */
     private $eventDispatcher;
 
+    /**
+     * @var ResultCreatorInterface|null
+     */
+    private $resultCreator = null;
+
     public function __construct(MetadataLoaderInterface $reader, SerializerInterface $serializer)
     {
         $this->setMetadataReader($reader);
@@ -85,6 +91,11 @@ class ClientFactory
         return MetadataUtils::getPort($portName, $service);
     }
 
+    public function setResultCreator(?ResultCreatorInterface $resultCreator): void
+    {
+        $this->resultCreator = $resultCreator;
+    }
+
     public function getClient(string $wsdl, ?string $portName = null, ?string $serviceName = null): Client
     {
         $service = $this->getSoapService($wsdl, $portName, $serviceName);
@@ -100,7 +111,8 @@ class ClientFactory
             $this->messageFactory,
             $this->streamFactory,
             $this->httpClient,
-            $this->eventDispatcher
+            $this->eventDispatcher,
+            $this->resultCreator
         );
     }
 }

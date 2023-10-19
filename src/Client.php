@@ -97,7 +97,8 @@ class Client
         RequestFactoryInterface $messageFactory,
         StreamFactoryInterface $streamFactory,
         ClientInterface $client,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        ?ResultCreatorInterface $resultCreator = null
     ) {
         $this->serviceDefinition = $serviceDefinition;
         $this->serializer = $serializer;
@@ -106,7 +107,7 @@ class Client
         $this->messageFactory = $messageFactory;
         $this->streamFactory = $streamFactory;
         $this->argumentsReader = new ArgumentsReader($this->serializer);
-        $this->resultCreator = new ResultCreator($this->serializer, !empty($serviceDefinition['unwrap']));
+        $this->resultCreator = $resultCreator ?? new ResultCreator($this->serializer, !empty($serviceDefinition['unwrap']));
         $this->eventDispatcher = $eventDispatcher;
     }
 
