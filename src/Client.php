@@ -72,15 +72,22 @@ class Client
      */
     private $eventDispatcher;
 
-    public function __construct(array $serviceDefinition, Serializer $serializer, MessageFactory $messageFactory, HttpClient $client, HeaderHandler $headerHandler, EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        array $serviceDefinition,
+        Serializer $serializer,
+        MessageFactory $messageFactory,
+        HttpClient $client,
+        HeaderHandler $headerHandler,
+        EventDispatcherInterface $eventDispatcher,
+        ?ResultCreatorInterface $resultCreator = null
+    ) {
         $this->serviceDefinition = $serviceDefinition;
         $this->serializer = $serializer;
 
         $this->client = $client;
         $this->messageFactory = $messageFactory;
         $this->argumentsReader = new ArgumentsReader($this->serializer, $headerHandler);
-        $this->resultCreator = new ResultCreator($this->serializer, !empty($serviceDefinition['unwrap']));
+        $this->resultCreator = $resultCreator ?? new ResultCreator($this->serializer, !empty($serviceDefinition['unwrap']));
         $this->eventDispatcher = $eventDispatcher;
     }
 

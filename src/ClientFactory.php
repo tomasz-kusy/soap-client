@@ -4,6 +4,7 @@ namespace GoetasWebservices\SoapServices\SoapClient;
 
 use GoetasWebservices\SoapServices\SoapClient\Arguments\Headers\Handler\HeaderHandler;
 use GoetasWebservices\SoapServices\SoapClient\Metadata\Loader\MetadataLoaderInterface;
+use GoetasWebservices\SoapServices\SoapClient\Result\ResultCreatorInterface;
 use GoetasWebservices\XML\WSDLReader\Exception\PortNotFoundException;
 use GoetasWebservices\XML\WSDLReader\Exception\ServiceNotFoundException;
 use Http\Client\HttpClient;
@@ -44,6 +45,11 @@ class ClientFactory
      * @var EventDispatcherInterface
      */
     private $eventDispatcher;
+
+    /**
+     * @var ResultCreatorInterface|null
+     */
+    private $resultCreator = null;
 
     public function __construct(MetadataLoaderInterface $reader, SerializerInterface $serializer)
     {
@@ -89,6 +95,11 @@ class ClientFactory
         $servicesMetadata = $this->reader->load($wsdl);
         $service = $this->getService($serviceName, $servicesMetadata);
         return $this->getPort($portName, $service);
+    }
+
+    public function setResultCreator(?ResultCreatorInterface $resultCreator): void
+    {
+        $this->resultCreator = $resultCreator;
     }
 
     /**
